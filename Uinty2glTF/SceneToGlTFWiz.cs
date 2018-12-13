@@ -138,8 +138,8 @@ namespace Uinty2glTF
 
             // Create rootNode
             GlTF_Node correctionNode = new GlTF_Node();
-            correctionNode.id = "UnityGlTF_root";
-            correctionNode.name = "UnityGlTF_root";
+            correctionNode.id = "Unity2glTF_root";
+            correctionNode.name = "Unity2glTF_root";
             GlTF_Writer.nodes.Add(correctionNode);
             GlTF_Writer.nodeNames.Add(correctionNode.name);
             GlTF_Writer.rootNodes.Add(correctionNode);
@@ -156,21 +156,21 @@ namespace Uinty2glTF
             List<Transform> trs = new List<Transform>(transforms);
             // Prefilter selected nodes and look for skinning in order to list "bones" nodes
             //FIXME: improve this
-            List<Transform> bones = new List<Transform>();
-            foreach (Transform tr in trs)
-            {
-                if (!tr.gameObject.activeSelf)
-                    continue;
+            //List<Transform> bones = new List<Transform>();
+            //foreach (Transform tr in trs)
+            //{
+            //    if (!tr.gameObject.activeSelf)
+            //        continue;
 
-                SkinnedMeshRenderer skin = tr.GetComponent<SkinnedMeshRenderer>();
-                if (skin)
-                {
-                    foreach (Transform bone in skin.bones)
-                    {
-                        bones.Add(bone);
-                    }
-                }
-            }
+            //    SkinnedMeshRenderer skin = tr.GetComponent<SkinnedMeshRenderer>();
+            //    if (skin)
+            //    {
+            //        foreach (Transform bone in skin.bones)
+            //        {
+            //            bones.Add(bone);
+            //        }
+            //    }
+            //}
 
             nbSelectedObjects = trs.Count;
             int nbDisabledObjects = 0;

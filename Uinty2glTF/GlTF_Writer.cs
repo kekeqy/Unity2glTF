@@ -216,8 +216,8 @@ namespace Uinty2glTF
             firsts[indent] = false;
         }
 
-        public string id;
-        public string name; // name of this object
+        public string id { get; set; }
+        public string name { get; set; } // name of this object
 
         // Extra data for objects
         public Dictionary<string, string> extraString = new Dictionary<string, string>();
