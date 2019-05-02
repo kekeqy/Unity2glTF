@@ -538,7 +538,7 @@ namespace Uinty2glTF
             {
                 //Debug.Log("No visible objects have been exported. Aboring export");
                 //yield return false;
-                if (callBack != null) callBack.Invoke(false, "µ¼³öÊ§°Ü£¬Ã»ÓĞ¿É¹©µ¼³öµÄÍø¸ñ¶ÔÏó£¡");
+                if (callBack != null) callBack.Invoke(false, "å¯¼å‡ºå¤±è´¥ï¼Œæ²¡æœ‰å¯ä¾›å¯¼å‡ºçš„ç½‘æ ¼å¯¹è±¡ï¼");
                 yield break;
             }
 
@@ -557,7 +557,7 @@ namespace Uinty2glTF
             }
             done = true;
 
-            if (callBack != null) callBack.Invoke(true, "µ¼³ö³É¹¦¡£");
+            if (callBack != null) callBack.Invoke(true, "å¯¼å‡ºæˆåŠŸã€‚");
             yield return true;
 
         }
