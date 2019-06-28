@@ -28,41 +28,22 @@ public class ForceExternalMaterialProcessor : AssetPostprocessor
         var modelImporter = assetImporter as ModelImporter;
         modelImporter.materialLocation = ModelImporterMaterialLocation.External;
     }
-    void OnPostprocessModel(GameObject go)
-    {
-        Debug.Log("go");
-        string ext = Path.GetExtension(assetPath);
-        string texturePath = assetPath.Replace(ext, ".fbm");
-        Renderer[] renderers = go.transform.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in renderers)
-        {
-            if (!renderer.sharedMaterial.mainTexture)
-            {
-                string[] temp = AssetDatabase.FindAssets(renderer.sharedMaterial.name, new string[] { texturePath });
-                if (temp.Length == 1)
-                {
-                    renderer.sharedMaterial.mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath(temp[0]));
-                }
-            }
-        }
-    }
-    void OnPostprocessMaterial(Material mat)
-    {
-        Debug.Log("mat");
-    }
     void OnPostprocessTexture(Texture2D texture)
     {
-        Debug.Log("tex");
+        //资源释放顺序Win：贴图-->材质-->物体，Linux：材质-->物体-->贴图
+        //以下代码为解决Linux材质无贴图问题
         string name = Path.GetFileNameWithoutExtension(assetPath);
-        string ext = Path.GetExtension(assetPath);
-        string path = assetPath.Replace(".fbm/" + name + ext, "");
-        int index = path.LastIndexOf("/");
-        path = path.Substring(0, index+1);
-        path += "Materials/" + name + ".mat";
-        Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
-        if(mat && !mat.mainTexture)
+        foreach (var kv in assetImporter.GetExternalObjectMap())
         {
-            mat.mainTexture = texture;
+            if (kv.Key.name == name && kv.Key.type == typeof(Material))
+            {
+                Material mat = kv.Value as Material;
+                if (!mat.mainTexture)
+                {
+                    mat.mainTexture = texture;
+                }
+                break;
+            }
         }
     }
 }
