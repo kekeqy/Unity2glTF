@@ -30,6 +30,7 @@ public class ForceExternalMaterialProcessor : AssetPostprocessor
     }
     void OnPostprocessModel(GameObject go)
     {
+        Debug.Log("go");
         string ext = Path.GetExtension(assetPath);
         string texturePath = assetPath.Replace(ext, ".fbm");
         Renderer[] renderers = go.transform.GetComponentsInChildren<Renderer>();
@@ -43,6 +44,25 @@ public class ForceExternalMaterialProcessor : AssetPostprocessor
                     renderer.sharedMaterial.mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath(temp[0]));
                 }
             }
+        }
+    }
+    void OnPostprocessMaterial(Material mat)
+    {
+        Debug.Log("mat");
+    }
+    void OnPostprocessTexture(Texture2D texture)
+    {
+        Debug.Log("tex");
+        string name = Path.GetFileNameWithoutExtension(assetPath);
+        string ext = Path.GetExtension(assetPath);
+        string path = assetPath.Replace(".fbm/" + name + ext, "");
+        int index = path.LastIndexOf("/");
+        path = path.Substring(0, index+1);
+        path += "Materials/" + name + ".mat";
+        Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if(mat && !mat.mainTexture)
+        {
+            mat.mainTexture = texture;
         }
     }
 }
