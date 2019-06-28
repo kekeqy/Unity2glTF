@@ -11,6 +11,7 @@
 //
 using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 public class ForceExternalMaterialProcessor : AssetPostprocessor
 {
@@ -19,13 +20,30 @@ public class ForceExternalMaterialProcessor : AssetPostprocessor
 #if UNITY_2018_1_OR_NEWER
         var importSettingsMissing = assetImporter.importSettingsMissing;
 #else
-        var importSettingsMissing = !System.IO.File.Exists(AssetDatabase.GetTextMetaFilePathFromAssetPath(assetPath));
+        var importSettingsMissing = !File.Exists(AssetDatabase.GetTextMetaFilePathFromAssetPath(assetPath));
 #endif
         if (!importSettingsMissing)
             return; // Asset imported already, do not process.
 
         var modelImporter = assetImporter as ModelImporter;
         modelImporter.materialLocation = ModelImporterMaterialLocation.External;
+    }
+    void OnPostprocessModel(GameObject go)
+    {
+        string ext = Path.GetExtension(assetPath);
+        string texturePath = assetPath.Replace(ext, ".fbm");
+        Renderer[] renderers = go.transform.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            if (!renderer.sharedMaterial.mainTexture)
+            {
+                string[] temp = AssetDatabase.FindAssets(renderer.sharedMaterial.name, new string[] { texturePath });
+                if (temp.Length == 1)
+                {
+                    renderer.sharedMaterial.mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(AssetDatabase.GUIDToAssetPath(temp[0]));
+                }
+            }
+        }
     }
 }
 #endif
