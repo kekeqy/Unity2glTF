@@ -140,6 +140,7 @@ namespace Uinty2glTF
             GlTF_Node correctionNode = new GlTF_Node();
             correctionNode.id = "Unity2glTF_root";
             correctionNode.name = "Unity2glTF_root";
+            correctionNode.rotation = new GlTF_Rotation(new Quaternion(0, 1, 0, 0));//物体正方向反过来了，让根节点绕y轴旋转180°
             GlTF_Writer.nodes.Add(correctionNode);
             GlTF_Writer.nodeNames.Add(correctionNode.name);
             GlTF_Writer.rootNodes.Add(correctionNode);

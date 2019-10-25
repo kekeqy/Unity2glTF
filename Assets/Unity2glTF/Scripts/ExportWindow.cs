@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace Uinty2glTF
 {
@@ -22,6 +23,8 @@ namespace Uinty2glTF
             window.Focus();
         }
 
+        private WebServer webServer;
+        private WebServer exportFileServer;
         private const int _spaceSize = 20;
         private const string _selectedCountFormat = "选中物体数量：{0}个";
         private int _selectedCount = 0;
@@ -37,6 +40,12 @@ namespace Uinty2glTF
         private SceneToGlTFWiz _exporter;
         public void OnEnable()
         {
+            if (webServer == null)
+            {
+                string basePath = Directory.GetParent(Application.dataPath).FullName;
+                webServer = new WebServer(9527, basePath + "/Assets/Unity2glTF/Web/");
+                exportFileServer = new WebServer(9528, basePath + "/export/");
+            }
             if (_exporterGo == null)
             {
                 _exporterGo = new GameObject("Exporter");
@@ -129,15 +138,21 @@ namespace Uinty2glTF
         {
             InitExportPath();
             string mExportPath = Directory.GetParent(Application.dataPath).FullName + "/export";
-            RNGCryptoServiceProvider csp = new RNGCryptoServiceProvider();
-            byte[] byteCsp = new byte[4];
-            csp.GetBytes(byteCsp);
-            string mParamName = System.BitConverter.ToString(byteCsp).Replace("-", null);
+            //RNGCryptoServiceProvider csp = new RNGCryptoServiceProvider();
+            //byte[] byteCsp = new byte[4];
+            //csp.GetBytes(byteCsp);
+            //string mParamName = System.BitConverter.ToString(byteCsp).Replace("-", null);
+            string mParamName = Selection.objects[0].name;
             string exportFileName = Path.Combine(mExportPath, mParamName + ".gltf");
             var callBack = new System.Action<bool, string>((bool state, string msg) =>
                {
                    _error = !state;
-                   if (state) _successMsg = msg;
+                   if (state)
+                   {
+                       _successMsg = msg;
+                       string url = string.Format("{0}?assetUrl={1}{2}.glb", webServer.Prefix, exportFileServer.Prefix, Selection.objects[0].name);
+                       Process.Start(url);
+                   }
                    else _errMsg = msg;
                });
             _exporter.ExportCoroutine(exportFileName, null, _glb, true, true, false, callBack);
@@ -157,7 +172,11 @@ namespace Uinty2glTF
         private void ClearScene()
         {
             GameObject[] objs = SceneManager.GetActiveScene().GetRootGameObjects();
-            for (int i = 0; i < objs.Length; i++) Object.DestroyImmediate(objs[i]);
+            for (int i = 0; i < objs.Length; i++)
+            {
+                if (objs[i].name == "Directional light" || objs[i].name == "Camera") continue;
+                DestroyImmediate(objs[i]);
+            }
             EditorSceneManager.MarkAllScenesDirty();
             EditorSceneManager.SaveOpenScenes();
             AssetDatabase.SaveAssets();

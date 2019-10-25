@@ -49,7 +49,15 @@ namespace Uinty2glTF
             }
             if (normalAccessor != null)
             {
-                normalAccessor.Populate(m.normals);
+                //Vector3[] normals = new Vector3[m.normals.Length];
+                //System.Array.Copy(m.normals, normals, normals.Length);
+                //for(int i = 0; i < normals.Length; i++)
+                //{
+                //    normals[i].x = -normals[i].x;
+                //    normals[i].y = -normals[i].y;
+                //    normals[i].z = -normals[i].z;
+                //}
+                normalAccessor.Populate(m.normals,true);
             }
             if (texCoord0Accessor != null)
             {
